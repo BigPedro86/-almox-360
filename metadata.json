@@ -1,0 +1,8 @@
+
+{
+  "name": "Almox 360°",
+  "description": "Sistema de controle de estoque, requisições e auditoria.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
