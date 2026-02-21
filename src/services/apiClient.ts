@@ -395,7 +395,13 @@ export const apiClient = {
         .select(); // Removido .single() para evitar o erro de coerção
 
       if (error) throw new Error(error.message);
-      return result ? result[0] : null;
+
+      // Se result estiver vázio, significa que o RLS bloqueou a alteração
+      if (!result || result.length === 0) {
+        throw new Error("Não foi possível alterar os dados. Verifique se você tem permissão de MASTER no banco de dados.");
+      }
+
+      return result[0];
     },
     delete: async (id: string) => {
       const { error } = await supabase.from('profiles').delete().eq('id', id);
