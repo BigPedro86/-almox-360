@@ -8,8 +8,7 @@ const Usuarios: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
-
-  // Edit State
+  const [searchTerm, setSearchTerm] = useState('');
   const [editingUser, setEditingUser] = useState<User | null>(null);
 
   const initialFormState = {
@@ -25,9 +24,10 @@ const Usuarios: React.FC = () => {
     setFetching(true);
     try {
       const data = await apiClient.users.getAll();
-      setUsers(data);
-    } catch (err) {
-      console.error("Failed to fetch users");
+      setUsers(data || []);
+    } catch (err: any) {
+      console.error("Failed to fetch users", err);
+      alert("Erro ao carregar lista de usuários: " + (err.message || "Verifique a conexão ou as permissões no Supabase."));
     } finally {
       setFetching(false);
     }
@@ -36,6 +36,13 @@ const Usuarios: React.FC = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  // Filter users based on search term
+  const filteredUsers = users.filter(u =>
+    u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.login?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    u.role?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleOpenModal = (user?: User) => {
     if (user) {
@@ -58,9 +65,12 @@ const Usuarios: React.FC = () => {
     setLoading(true);
     try {
       if (editingUser) {
-        const updateData: any = { ...formData };
-        if (!updateData.password) delete updateData.password; // Don't update if empty
-        await apiClient.users.update(editingUser.id, updateData);
+        // Only send what changed or valid profile fields
+        await apiClient.users.update(editingUser.id, {
+          name: formData.name,
+          role: formData.role,
+          password: formData.password || undefined // Only send if not empty
+        });
       } else {
         await apiClient.auth.register({
           login: formData.login,
@@ -71,9 +81,8 @@ const Usuarios: React.FC = () => {
       }
       await fetchUsers();
       setIsModalOpen(false);
-      setFormData(initialFormState);
     } catch (err: any) {
-      alert("Erro ao salvar usuário: " + (err.message || "Erro desconhecido"));
+      alert("Erro ao salvar: " + (err.message || "Erro inesperado. Verifique os campos."));
     } finally {
       setLoading(false);
     }
@@ -84,18 +93,18 @@ const Usuarios: React.FC = () => {
     try {
       await apiClient.users.update(id, { active: !currentStatus });
       await fetchUsers();
-    } catch (err) {
-      alert("Erro ao atualizar status");
+    } catch (err: any) {
+      alert("Erro ao mudar status: " + (err.message || "Erro de permissão."));
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("Tem certeza que deseja remover este usuário?")) return;
+    if (!window.confirm("ATENÇÃO: Isso removerá o PERFIL do usuário do sistema. Você tem certeza?")) return;
     try {
       await apiClient.users.delete(id);
       await fetchUsers();
-    } catch (err) {
-      alert("Erro ao remover usuário");
+    } catch (err: any) {
+      alert("Erro ao remover: " + (err.message || "Verifique se o usuário possui vínculos ou se você é MASTER."));
     }
   };
 
@@ -113,6 +122,8 @@ const Usuarios: React.FC = () => {
               type="text"
               placeholder="Buscar Usuário..."
               className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-md focus:ring-1 focus:ring-blue-500 outline-none text-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <button
@@ -139,7 +150,7 @@ const Usuarios: React.FC = () => {
             <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
               {fetching ? (
                 <tr><td colSpan={4} className="p-10 text-center text-slate-500">Carregando...</td></tr>
-              ) : users.map((u, idx) => (
+              ) : filteredUsers.map((u, idx) => (
                 <tr key={u.id} className={`${idx % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-50 dark:bg-slate-800/50'} hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors`}>
                   <td className="px-4 py-2 border-r border-slate-200 dark:border-slate-700">
                     <div className="font-bold text-slate-700 dark:text-slate-200">{u.name}</div>
@@ -185,7 +196,7 @@ const Usuarios: React.FC = () => {
               ))}
             </tbody>
           </table>
-          {users.length === 0 && !fetching && (
+          {filteredUsers.length === 0 && !fetching && (
             <div className="p-8 text-center text-slate-400 text-sm">Nenhum usuário encontrado.</div>
           )}
         </div>
