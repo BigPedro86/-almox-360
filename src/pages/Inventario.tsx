@@ -2,26 +2,13 @@ import React, { useState } from 'react';
 import { Search, Plus, History } from 'lucide-react';
 import HistoryList from '../components/Inventario/HistoryList';
 import SetupModal from '../components/Inventario/SetupModal';
+import InventoryAuditModal from '../components/Inventario/InventoryAuditModal';
 import { useInventory } from '../hooks/useInventory';
 
 const Inventario: React.FC = () => {
-  const { cycles, startCycle, loading } = useInventory();
+  const { cycles, fetchCycles, loading } = useInventory();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleStartInventory = async () => {
-    try {
-      await startCycle({
-        date: new Date().toISOString().split('T')[0],
-        responsible: 'Admin Master', // Simulated current user
-        items: 0,
-        diff: 0,
-        status: 'EM ANDAMENTO'
-      });
-      setIsModalOpen(false);
-    } catch (err) {
-      alert("Erro ao iniciar ciclo.");
-    }
-  };
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
 
   return (
     <div className="space-y-4 animate-in fade-in duration-500">
@@ -40,22 +27,21 @@ const Inventario: React.FC = () => {
             />
           </div>
           <button
-            onClick={() => setIsModalOpen(true)}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-md transition-all font-semibold text-sm shadow-sm"
+            onClick={() => setIsAuditModalOpen(true)}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 rounded-md transition-all font-semibold text-sm shadow-sm"
           >
             <Plus size={16} />
-            Novo Ciclo
+            Iniciar Inventário / Implantação
           </button>
         </div>
       </div>
 
       <HistoryList cycles={cycles as any} />
-      {/* Assuming HistoryList types might mismatch slightly (number vs string id), but generally compatible. Cast to any if needed or fix types later. */}
 
-      <SetupModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onConfirm={handleStartInventory}
+      <InventoryAuditModal
+        isOpen={isAuditModalOpen}
+        onClose={() => setIsAuditModalOpen(false)}
+        onFinished={fetchCycles}
       />
     </div>
   );
