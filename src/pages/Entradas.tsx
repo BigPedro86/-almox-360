@@ -176,7 +176,7 @@ const Entradas: React.FC = () => {
 
                 <div className="md:col-span-2 border-t border-slate-100 dark:border-slate-800 pt-4 mt-2">
                   <h4 className="text-xs font-bold text-blue-600 uppercase mb-4 flex items-center gap-2">
-                    <Tag size={14} /> Detalhes do Item Loteado
+                    <Tag size={14} /> Detalhes do Item
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="sm:col-span-2">
@@ -191,12 +191,48 @@ const Entradas: React.FC = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Lote (Fabricante)</label>
-                      <input required value={formData.lot} onChange={e => setFormData({ ...formData, lot: e.target.value })} placeholder="L-2024-XXXX" className="w-full p-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-blue-500 outline-none text-sm" />
+                      <div className="flex justify-between items-center mb-1.5">
+                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">Lote (Fabricante)</label>
+                        <label className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-500 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="w-3 h-3 rounded border-slate-300"
+                            checked={formData.lot === 'N/A'}
+                            onChange={e => setFormData({ ...formData, lot: e.target.checked ? 'N/A' : '' })}
+                          />
+                          Não possui lote
+                        </label>
+                      </div>
+                      <input
+                        required={formData.lot !== 'N/A'}
+                        disabled={formData.lot === 'N/A'}
+                        value={formData.lot}
+                        onChange={e => setFormData({ ...formData, lot: e.target.value })}
+                        placeholder={formData.lot === 'N/A' ? "Não aplicável" : "L-2024-XXXX"}
+                        className="w-full p-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-blue-500 outline-none text-sm disabled:opacity-50 disabled:bg-slate-100"
+                      />
                     </div>
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Validade</label>
-                      <input type="date" required value={formData.expiry} onChange={e => setFormData({ ...formData, expiry: e.target.value })} className="w-full p-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-blue-500 outline-none text-sm" />
+                      <div className="flex justify-between items-center mb-1.5">
+                        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">Validade</label>
+                        <label className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-500 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="w-3 h-3 rounded border-slate-300"
+                            checked={!formData.expiry && formData.expiry !== undefined && (formData as any).noExpiry}
+                            onChange={e => setFormData({ ...formData, expiry: e.target.checked ? '' : '', noExpiry: e.target.checked } as any)}
+                          />
+                          Sem validade
+                        </label>
+                      </div>
+                      <input
+                        type="date"
+                        required={!(formData as any).noExpiry}
+                        disabled={(formData as any).noExpiry}
+                        value={formData.expiry}
+                        onChange={e => setFormData({ ...formData, expiry: e.target.value })}
+                        className="w-full p-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-blue-500 outline-none text-sm disabled:opacity-50 disabled:bg-slate-100"
+                      />
                     </div>
                     <div className="grid grid-cols-2 gap-4 col-span-2 sm:col-span-2">
                       <div>
