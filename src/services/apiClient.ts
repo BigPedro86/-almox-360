@@ -382,7 +382,13 @@ export const apiClient = {
 
       return data.map((p: any) => ({
         ...p,
-        login: p.email || p.login || 'Usuário no Auth' // Tenta várias fontes para o login
+        login: p.email || p.login || 'Usuário no Auth', // Tenta várias fontes para o login
+        settings: p.settings || {
+          theme: 'light',
+          expiringLotsAlertDays: 30,
+          allowPartialFulfillment: false,
+          requireReceiptConfirmation: true
+        }
       }));
     },
     update: async (id: string, data: any) => {
@@ -392,6 +398,7 @@ export const apiClient = {
       if (data.role !== undefined) profileUpdates.role = data.role;
       if (data.active !== undefined) profileUpdates.active = data.active;
       if (data.department !== undefined) profileUpdates.department = data.department;
+      if (data.settings !== undefined) profileUpdates.settings = data.settings;
 
       const { data: result, error } = await supabase
         .from('profiles')
