@@ -105,7 +105,6 @@ const Requisitions: React.FC = () => {
       <div className="flex overflow-x-auto border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 rounded-t-md">
         <TabButton id="TODOS" label="Todas" />
         <TabButton id="RASCUNHOS" label="Rascunhos" />
-        <TabButton id="APROVACAO" label="Aguardando Aprovação" />
         <TabButton id="ATENDIMENTO" label="Em Atendimento" />
         <TabButton id="FINALIZADOS" label="Finalizadas" />
       </div>
