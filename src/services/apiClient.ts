@@ -368,17 +368,37 @@ export const apiClient = {
     update: async (id: string, data: any) => handleResponse(supabase.from('inventory_cycles').update(data).eq('id', id))
   },
   users: {
-    // We fetch from 'profiles' table which mirrors auth users public info
-    getAll: async () => handleResponse(supabase.from('profiles').select('*')),
-    create: async (data: any) => {
-      // Warning: Creating users directly via client API usually requires Admin API or signUp
-      // For now we will just use signUp in the auth service
-      throw new Error("Use register function");
+    getAll: async () => {
+      const { data, error } = await supabase.from('profiles').select('*');
+      if (error) throw new Error(error.message);
+      // Map email/login from auth if possible or just return profiles
+      return data.map((p: any) => ({
+        ...p,
+        login: p.email || '' // Profiles might not have email, but UI expects 'login'
+      }));
     },
-    update: async (id: string, data: any) => handleResponse(supabase.from('profiles').update(data).eq('id', id)),
+    update: async (id: string, data: any) => {
+      // Create a clean object with only columns that exist in public.profiles
+      const profileUpdates: any = {};
+      if (data.name !== undefined) profileUpdates.name = data.name;
+      if (data.role !== undefined) profileUpdates.role = data.role;
+      if (data.active !== undefined) profileUpdates.active = data.active;
+      if (data.department !== undefined) profileUpdates.department = data.department;
+
+      const { data: result, error } = await supabase
+        .from('profiles')
+        .update(profileUpdates)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw new Error(error.message);
+      return result;
+    },
     delete: async (id: string) => {
-      // Deleting users is restricted
-      throw new Error("Cannot delete users via client API");
+      const { error } = await supabase.from('profiles').delete().eq('id', id);
+      if (error) throw new Error(error.message);
+      return true;
     }
   }
 };
