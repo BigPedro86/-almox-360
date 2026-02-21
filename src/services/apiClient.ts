@@ -70,7 +70,7 @@ export const apiClient = {
   },
   items: {
     getAll: async () => {
-      const { data, error } = await supabase.from('items').select('*').order('created_at', { ascending: false });
+      const { data, error } = await supabase.from('items').select('*').order('code');
       if (error) throw new Error(error.message);
       return data.map((item: any) => ({
         ...item,
@@ -80,10 +80,11 @@ export const apiClient = {
         reorderPoint: item.reorder_point,
         defaultAddress: item.location,
         controlLot: item.control_lot,
-        controlExpiry: item.control_expiry
+        controlExpiry: item.control_expiry,
+        price: item.price || 0
       }));
     },
-    create: async (item: any) => {
+    create: async (item: Partial<Item>) => {
       const dbItem = {
         code: item.code,
         description: item.description,
@@ -96,7 +97,8 @@ export const apiClient = {
         unit: item.unit,
         control_lot: item.controlLot,
         control_expiry: item.controlExpiry,
-        active: item.active !== false
+        active: item.active !== false,
+        price: item.price || 0
       };
       const { data, error } = await supabase.from('items').insert(dbItem).select().single();
       if (error) throw new Error(error.message);
@@ -108,7 +110,8 @@ export const apiClient = {
         reorderPoint: data.reorder_point,
         defaultAddress: data.location,
         controlLot: data.control_lot,
-        controlExpiry: data.control_expiry
+        controlExpiry: data.control_expiry,
+        price: data.price || 0
       };
     },
     update: async (id: string, item: Partial<Item>) => {
@@ -125,6 +128,7 @@ export const apiClient = {
       if (item.controlLot !== undefined) dbItem.control_lot = item.controlLot;
       if (item.controlExpiry !== undefined) dbItem.control_expiry = item.controlExpiry;
       if (item.active !== undefined) dbItem.active = item.active;
+      if (item.price !== undefined) dbItem.price = item.price;
 
       const { data, error } = await supabase.from('items').update(dbItem).eq('id', id).select().single();
       if (error) throw new Error(error.message);
@@ -136,7 +140,8 @@ export const apiClient = {
         reorderPoint: data.reorder_point,
         defaultAddress: data.location,
         controlLot: data.control_lot,
-        controlExpiry: data.control_expiry
+        controlExpiry: data.control_expiry,
+        price: data.price || 0
       };
     },
     delete: async (id: string) => handleResponse(supabase.from('items').delete().eq('id', id)),

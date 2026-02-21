@@ -37,6 +37,7 @@ export type Item = {
   controlExpiry: boolean;
   defaultAddress: string;
   active: boolean;
+  price: number;
 };
 
 export enum RequisitionStatus {
