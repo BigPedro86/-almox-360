@@ -103,7 +103,16 @@ const InventoryAuditModal: React.FC<InventoryAuditModalProps> = ({ isOpen, onClo
 
                 <div className="flex-1 overflow-y-auto p-6">
                     {loading ? (
-                        <div className="text-center py-10 text-slate-500">Carregando itens...</div>
+                        <div className="text-center py-10 text-slate-500">
+                            <div className="animate-spin inline-block w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full mb-2"></div>
+                            <p>Carregando itens...</p>
+                        </div>
+                    ) : items.length === 0 ? (
+                        <div className="text-center py-20 bg-slate-50 dark:bg-slate-800/20 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700">
+                            <Package size={48} className="mx-auto text-slate-300 mb-4" />
+                            <p className="text-slate-600 dark:text-slate-400 font-medium">Nenhum item encontrado no cadastro.</p>
+                            <p className="text-xs text-slate-500 mt-1">Cadastre seus itens no menu "Itens" antes de iniciar a implantação.</p>
+                        </div>
                     ) : (
                         <table className="w-full text-sm">
                             <thead className="sticky top-0 bg-white dark:bg-slate-900 text-slate-500 uppercase text-[10px] font-bold border-b border-slate-100 dark:border-slate-800">
