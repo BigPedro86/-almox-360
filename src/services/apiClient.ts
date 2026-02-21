@@ -392,11 +392,10 @@ export const apiClient = {
         .from('profiles')
         .update(profileUpdates)
         .eq('id', id)
-        .select()
-        .single();
+        .select(); // Removido .single() para evitar o erro de coerção
 
       if (error) throw new Error(error.message);
-      return result;
+      return result ? result[0] : null;
     },
     delete: async (id: string) => {
       const { error } = await supabase.from('profiles').delete().eq('id', id);
