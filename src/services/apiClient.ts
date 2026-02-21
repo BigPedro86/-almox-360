@@ -369,12 +369,15 @@ export const apiClient = {
   },
   users: {
     getAll: async () => {
-      const { data, error } = await supabase.from('profiles').select('*');
+      const { data, error } = await supabase.from('profiles').select('*').order('name');
       if (error) throw new Error(error.message);
-      // Map email/login from auth if possible or just return profiles
+
+      // Se não houver dados, retorna array vazio para não quebrar o painel
+      if (!data) return [];
+
       return data.map((p: any) => ({
         ...p,
-        login: p.email || '' // Profiles might not have email, but UI expects 'login'
+        login: p.email || p.login || 'Usuário no Auth' // Tenta várias fontes para o login
       }));
     },
     update: async (id: string, data: any) => {
