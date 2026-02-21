@@ -115,10 +115,10 @@ const CreateRequisitionModal: React.FC<CreateRequisitionModalProps> = ({ isOpen,
                 requesterName: user.name,
                 date: new Date().toISOString().split('T')[0],
                 priority: formData.priority as any,
-                status: RequisitionStatus.RASCUNHO,
+                status: 'APROVADO' as any,
                 items: addedItems,
                 observations: formData.observations,
-                timeline: [{ status: RequisitionStatus.RASCUNHO, userId: user.id, userName: user.name, timestamp: new Date().toISOString() }]
+                timeline: [{ status: 'APROVADO' as any, userId: user.id, userName: user.name, timestamp: new Date().toISOString() }]
             };
 
             await onCreate(newReq);
@@ -246,7 +246,7 @@ const CreateRequisitionModal: React.FC<CreateRequisitionModalProps> = ({ isOpen,
                     <button type="button" onClick={onClose} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-md text-sm font-semibold transition-colors">Cancelar</button>
                     <button onClick={handleCreate} disabled={loading || addedItems.length === 0} className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md flex items-center gap-2 hover:bg-blue-700 transition-all shadow-sm disabled:opacity-50 text-sm">
                         <Save size={16} />
-                        Salvar Rascunho
+                        Criar Requisição
                     </button>
                 </div>
             </div>
