@@ -109,6 +109,10 @@ const Usuarios: React.FC = () => {
   };
 
   const handleResendInvite = async (email: string) => {
+    if (!email || email === 'Usuário no Auth' || !email.includes('@')) {
+      alert("Este usuário não possui um e-mail válido vinculado ao perfil. Por favor, rode o script SQL de atualização de e-mails.");
+      return;
+    }
     try {
       await apiClient.auth.resendInvite(email);
       alert(`E-mail de acesso reenviado para ${email}`);
