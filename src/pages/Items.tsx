@@ -23,7 +23,10 @@ const Items: React.FC = () => {
     minStock: 0,
     maxStock: 0,
     reorderPoint: 0,
-    defaultAddress: ''
+    defaultAddress: '',
+    price: 0,
+    controlLot: false,
+    controlExpiry: false
   };
 
   const [formData, setFormData] = useState(initialFormState);
@@ -39,7 +42,10 @@ const Items: React.FC = () => {
         minStock: item.minStock,
         maxStock: item.maxStock,
         reorderPoint: item.reorderPoint || 0,
-        defaultAddress: item.defaultAddress || ''
+        defaultAddress: item.defaultAddress || '',
+        price: item.price || 0,
+        controlLot: item.controlLot || false,
+        controlExpiry: item.controlExpiry || false
       });
     } else {
       setEditingItem(null);
@@ -72,8 +78,8 @@ const Items: React.FC = () => {
 
       setIsModalOpen(false);
       setFormData(initialFormState);
-    } catch (err) {
-      alert("Erro ao salvar item");
+    } catch (err: any) {
+      alert("Erro ao salvar item: " + (err.message || "Verifique os dados e tente novamente."));
     } finally {
       setLoading(false);
     }
@@ -231,6 +237,23 @@ const Items: React.FC = () => {
                   <div>
                     <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Estoque Máx.</label>
                     <input type="number" required value={formData.maxStock} onChange={e => setFormData({ ...formData, maxStock: Number(e.target.value) })} className="w-full p-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-blue-500 outline-none text-sm" />
+                  </div>
+                </div>
+
+                <div className="md:col-span-4 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-slate-100 dark:border-slate-800 pt-4 mt-2">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Valor Unitário (R$)</label>
+                    <input type="number" step="0.01" value={formData.price} onChange={e => setFormData({ ...formData, price: Number(e.target.value) })} className="w-full p-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-md focus:ring-1 focus:ring-blue-500 outline-none text-sm" />
+                  </div>
+                  <div className="flex items-center gap-4 h-full pt-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={formData.controlLot} onChange={e => setFormData({ ...formData, controlLot: e.target.checked })} className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Controla Lote</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={formData.controlExpiry} onChange={e => setFormData({ ...formData, controlExpiry: e.target.checked })} className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">Controla Validade</span>
+                    </label>
                   </div>
                 </div>
               </div>
