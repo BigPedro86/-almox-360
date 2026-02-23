@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, UserPlus, Shield, X, Save, Search, Trash2, Edit2 } from 'lucide-react';
+import { Users, UserPlus, Shield, X, Save, Search, Trash2, Edit2, Mail } from 'lucide-react';
 import { apiClient } from '../services/apiClient';
 import { User, UserRole } from '../types';
 
@@ -108,6 +108,15 @@ const Usuarios: React.FC = () => {
     }
   };
 
+  const handleResendInvite = async (email: string) => {
+    try {
+      await apiClient.auth.resendInvite(email);
+      alert(`E-mail de acesso reenviado para ${email}`);
+    } catch (err: any) {
+      alert("Erro ao reenviar: " + (err.message || "Tente novamente mais tarde."));
+    }
+  };
+
   return (
     <div className="space-y-4 animate-in fade-in duration-500">
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-md shadow-sm border border-slate-200 dark:border-slate-700">
@@ -182,6 +191,13 @@ const Usuarios: React.FC = () => {
                         title={u.active ? "Desativar" : "Ativar"}
                       >
                         <Shield size={14} />
+                      </button>
+                      <button
+                        onClick={() => handleResendInvite(u.login)}
+                        className="p-1.5 text-slate-400 hover:text-blue-600 transition-all"
+                        title="Reenviar Confirmação de E-mail"
+                      >
+                        <Mail size={14} />
                       </button>
                       <button
                         onClick={() => handleDelete(u.id)}

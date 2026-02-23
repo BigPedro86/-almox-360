@@ -46,6 +46,7 @@ export const apiClient = {
         email: data.login,
         password: data.password,
         options: {
+          emailRedirectTo: window.location.origin,
           data: {
             name: data.name,
             role: data.role || 'REQUISITANTE'
@@ -54,6 +55,17 @@ export const apiClient = {
       });
       if (authError) throw authError;
       return { success: true, user: authData.user };
+    },
+    resendInvite: async (email: string) => {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: window.location.origin,
+        },
+      });
+      if (error) throw error;
+      return true;
     },
     logout: async () => {
       const { error } = await supabase.auth.signOut();
